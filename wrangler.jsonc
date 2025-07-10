@@ -1,0 +1,25 @@
+/**
+ * Wrangler config for the Roundtable Cloudflare Bot-Gate.
+ * Keep one config file only (jsonc *or* toml).
+ * Fill in the namespace IDs after creating them:
+ *   wrangler kv:namespace create RT_BLOCKED
+ *   wrangler kv:namespace create RT_BLOCKED --preview
+ */
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "roundtable-cloudflare-bot-gate",
+  "compatibility_date": "2025-07-09",
+
+  "compatibility_flags": [
+    "nodejs_compat",
+    "global_fetch_strictly_public"
+  ],
+
+  "kv_namespaces": [
+    {
+      "binding": "RT_BLOCKED",
+      "id": "",          // production KV id
+      "preview_id": ""   // preview KV id (for wrangler pages dev)
+    }
+  ]
+}
