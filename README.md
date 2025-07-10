@@ -4,7 +4,7 @@ Adds Roundtable’s behavioral‑biometric **auto‑block** gate to any existing
 
 ---
 
-## 1 · Embed the Roundtable tracker
+### 1 · Embed the Roundtable tracker
 
 ```html
 <script
@@ -14,12 +14,9 @@ Adds Roundtable’s behavioral‑biometric **auto‑block** gate to any existing
   data-user-id="OPTIONAL_USER_ID">
 </script>
 ```
-* Get `YOUR_SITE_KEY` at <https://accounts.roundtable.ai/account/keys>.
-* Full tracker docs: <https://docs.roundtable.ai>.
+Get `YOUR_SITE_KEY` at <https://accounts.roundtable.ai/account/keys>. The full tracker docs are available at <https://docs.roundtable.ai>.
 
----
-
-## 2 · Install & initialise
+### 2 · Install & initialise
 
 ```bash
 # Add dev dependency
@@ -30,12 +27,11 @@ npx roundtable-cloudflare-bot-gate init
 ```
 `init` does three things:
 1. Adds `functions/_middleware.js` and `functions/rt-block.js`.
-2. Patches **wrangler.jsonc** (or `.toml`) to insert a **RT_BLOCKED** KV binding **with blank `id` / `preview_id`**.
-3. Generates a 64‑char **RT_WEBHOOK_TOKEN** and prints it.
+2. Patches `wrangler.jsonc` (or `.toml`) to insert a `RT_BLOCKED` KV binding with blank `id` / `preview_id`.
+3. Generates a 64‑char `RT_WEBHOOK_TOKEN` and prints it.
 
----
 
-## 3 · Create the KV namespaces
+### 3 · Create the KV namespaces
 
 Run once, copy the IDs Wrangler prints, and paste them into your config:
 
@@ -55,25 +51,21 @@ After pasting, your config should look like:
 ]
 ```
 
----
+### 4 · Email your token + webhook URL (beta step)
 
-## 4 · Email your token + webhook URL (beta step)
-
-Send the token printed in step 2 **and** your webhook endpoint to <support@roundtable.ai> so we can enable blocking for your site.
+Send the token printed in step 2 and your webhook endpoint to <support@roundtable.ai> so we can enable blocking for your site.
 
 ```
 Endpoint:  https://<your‑domain>/rt-block
 Token:     <RT_WEBHOOK_TOKEN>
 ```
 
----
-
-## 5 · Deploy
+### 5 · Deploy
 
 ```bash
 wrangler pages deploy
 ```
-Roundtable will now write `sid:<id>` into **RT_BLOCKED** when it detects fraud; the middleware returns **403** on the very next request.
+Roundtable will now write `sid:<id>` into `RT_BLOCKED` when it detects fraud; the middleware returns 403 on the very next request.
 
 ---
 
