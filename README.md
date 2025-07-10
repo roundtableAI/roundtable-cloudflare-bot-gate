@@ -1,10 +1,10 @@
 # Roundtable × Cloudflare Pages — Bot‑Gate Drop‑In (Beta)
 
-Adds Roundtable’s behavioral‑biometric **auto‑block** gate to any existing Cloudflare Pages project. The block‑list lives in Cloudflare KV, so a hot lookup adds only ~1 ms of latency.
+Adds Roundtable’s auto‑block gate to any existing Cloudflare Pages project. The block‑list lives in Cloudflare KV, so a hot lookup adds only ~1 ms of latency.
 
 ---
 
-### 1 · Embed the Roundtable tracker
+### 1. Embed the Roundtable tracker
 
 ```html
 <script
@@ -16,7 +16,7 @@ Adds Roundtable’s behavioral‑biometric **auto‑block** gate to any existing
 ```
 Get `YOUR_SITE_KEY` at <https://accounts.roundtable.ai/account/keys>. The full tracker docs are available at <https://docs.roundtable.ai>.
 
-### 2 · Install & initialise
+### 2. Install & initialize
 
 ```bash
 # Add dev dependency
@@ -31,7 +31,7 @@ npx roundtable-cloudflare-bot-gate init
 3. Generates a 64‑char `RT_WEBHOOK_TOKEN` and prints it.
 
 
-### 3 · Create the KV namespaces
+### 3. Create the KV namespaces
 
 Run once, copy the IDs Wrangler prints, and paste them into your config:
 
@@ -51,7 +51,7 @@ After pasting, your config should look like:
 ]
 ```
 
-### 4 · Email your token + webhook URL (beta step)
+### 4. Email your token + webhook URL (beta step)
 
 Send the token printed in step 2 and your webhook endpoint to <support@roundtable.ai> so we can enable blocking for your site.
 
@@ -60,7 +60,7 @@ Endpoint:  https://<your‑domain>/rt-block
 Token:     <RT_WEBHOOK_TOKEN>
 ```
 
-### 5 · Deploy
+### 5. Deploy
 
 ```bash
 wrangler pages deploy
