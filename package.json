@@ -1,6 +1,6 @@
 {
   "name": "roundtable-cloudflare-bot-gate",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Roundtable bot-gate for Cloudflare Pages",
   "bin": {
     "roundtable-cloudflare-bot-gate": "cli.js"
