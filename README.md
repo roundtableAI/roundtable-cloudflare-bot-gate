@@ -30,8 +30,15 @@ npx roundtable-cloudflare-bot-gate init
 2. Patches `wrangler.jsonc` (or `.toml`) to insert a `RT_BLOCKED` KV binding with blank `id` / `preview_id`.
 3. Generates a 64‑char `RT_WEBHOOK_TOKEN` and prints it.
 
+### 3. Store the secret in Cloudflare
 
-### 3. Create the KV namespaces
+```bash
+echo <RT_WEBHOOK_TOKEN> | wrangler secret put RT_WEBHOOK_TOKEN
+```
+
+Use the token printed by `init`.
+
+### 4. Create the KV namespaces
 
 Run once, copy the IDs Wrangler prints, and paste them into your config:
 
@@ -51,7 +58,7 @@ After pasting, your config should look like:
 ]
 ```
 
-### 4. Email your token + webhook URL (beta step)
+### 5. Email your token + webhook URL (beta step)
 
 Send the token printed in step 2 and your webhook endpoint to <support@roundtable.ai> so we can enable blocking for your site.
 
@@ -60,7 +67,7 @@ Endpoint:  https://<your‑domain>/rt-block
 Token:     <RT_WEBHOOK_TOKEN>
 ```
 
-### 5. Deploy
+### 6. Deploy
 
 ```bash
 wrangler pages deploy

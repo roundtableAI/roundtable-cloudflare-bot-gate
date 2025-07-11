@@ -121,16 +121,6 @@ function printNextSteps(token) {
 
     const token = generateToken();
 
-    // Attempt to save secret automatically (will still prompt for confirmation)
-    const wrangler = spawnSync(
-      'wrangler',
-      ['secret', 'put', 'RT_WEBHOOK_TOKEN'],
-      { input: token + '\n', stdio: ['pipe', 'inherit', 'inherit'] }
-    );
-    if (wrangler.status !== 0) {
-      console.warn('⚠  Could not set secret automatically. Paste it manually.');
-    }
-
     printNextSteps(token);
   } catch (err) {
     console.error(err);
