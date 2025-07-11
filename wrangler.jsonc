@@ -13,13 +13,5 @@
   "compatibility_flags": [
     "nodejs_compat",
     "global_fetch_strictly_public"
-  ],
-
-  "kv_namespaces": [
-    {
-      "binding": "RT_BLOCKED",
-      "id": "",          // production KV id
-      "preview_id": ""   // preview KV id (for wrangler pages dev)
-    }
   ]
 }

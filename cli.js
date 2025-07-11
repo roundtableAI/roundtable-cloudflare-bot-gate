@@ -14,7 +14,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
-import { spawnSync } from 'child_process';
+import { execSync } from 'child_process';
 
 const [, , cmd, ...flags] = process.argv;
 if (cmd !== 'init') {
@@ -71,21 +71,40 @@ function stripComments(str) {
   return str.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, '');
 }
 
+function createKV(name, preview = false) {
+  const args = ['kv', 'namespace', 'create', name];
+  if (preview) args.push('--preview');
+  args.push('--json');                     // machine-readable
+  const out = execSync(`npx wrangler ${args.join(' ')}`, { encoding: 'utf8' });
+  return JSON.parse(out).id;               // UUID string
+}
+
 async function patchWrangler() {
   const wranglerPath = path.join(CWD, 'wrangler.jsonc');
   if (!(await exists(wranglerPath))) {
-    console.warn('⚠  wrangler.jsonc not found — please add KV binding & secret manually.');
+    console.warn('⚠  wrangler.jsonc not found — add KV binding & secret manually.');
     return;
   }
 
   const raw = await fs.readFile(wranglerPath, 'utf8');
   const cfg = JSON.parse(stripComments(raw));
 
-  // Ensure KV namespace binding
-  cfg.kv_namespaces = cfg.kv_namespaces || [];
-  if (!cfg.kv_namespaces.some(n => n.binding === 'RT_BLOCKED')) {
-    cfg.kv_namespaces.push({ binding: 'RT_BLOCKED', id: '', preview_id: '' });
+  cfg.kv_namespaces ??= [];
+  let kv = cfg.kv_namespaces.find(n => n.binding === 'RT_BLOCKED');
+
+  if (!kv) {
+    kv = { binding: 'RT_BLOCKED', id: '', preview_id: '' };
+    cfg.kv_namespaces.push(kv);
     console.log('➕  Added RT_BLOCKED KV binding');
+  }
+
+  if (!kv.id) {
+    kv.id = createKV('RT_BLOCKED');
+    console.log(`✔  Created production KV: ${kv.id}`);
+  }
+  if (!kv.preview_id) {
+    kv.preview_id = createKV('RT_BLOCKED', true);
+    console.log(`✔  Created preview KV:    ${kv.preview_id}`);
   }
 
   await fs.writeFile(wranglerPath, JSON.stringify(cfg, null, 2));
