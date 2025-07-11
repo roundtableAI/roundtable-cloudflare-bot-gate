@@ -1,9 +1,8 @@
 #!/usr/bin/env node
-// Roundtable × Cloudflare Bot‑Gate — CLI initialiser
+// Roundtable × Cloudflare Bot‑Gate — CLI initialiser
 // Usage:   npx roundtable-cloudflare-bot-gate init [--force]
 // -----------------------------------------------------------
-// • Copies the gate functions into the caller’s repo
-// • Patches wrangler.jsonc (creates kv binding & secret key)
+// • Copies the gate functions into the caller's repo
 // • Generates a 64‑char RT_WEBHOOK_TOKEN and prints next steps
 //
 // Exits non‑zero if a conflicting _middleware.js exists and
@@ -14,7 +13,6 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import crypto from 'crypto';
-import { execSync } from 'child_process';
 
 const [, , cmd, ...flags] = process.argv;
 if (cmd !== 'init') {
@@ -65,56 +63,7 @@ async function copyFunctions() {
 }
 
 /* ---------------------------------------------------------
- * 3 · Patch wrangler.jsonc (JSON with comments)
- * -------------------------------------------------------*/
-function stripComments(str) {
-  return str.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, '');
-}
-
-function createKV(name, preview = false) {
-  const args = ['kv', 'namespace', 'create', name];
-  if (preview) args.push('--preview');
-
-  const out = execSync(`npx wrangler ${args.join(' ')}`, { encoding: 'utf8' });
-  const match = out.match(/id:\\s*([\\w-]{32,})/);
-  if (!match) throw new Error('Could not extract KV id from Wrangler output');
-  return match[1];               // UUID string
-}
-
-async function patchWrangler() {
-  const wranglerPath = path.join(CWD, 'wrangler.jsonc');
-  if (!(await exists(wranglerPath))) {
-    console.warn('⚠  wrangler.jsonc not found — add KV binding & secret manually.');
-    return;
-  }
-
-  const raw = await fs.readFile(wranglerPath, 'utf8');
-  const cfg = JSON.parse(stripComments(raw));
-
-  cfg.kv_namespaces ??= [];
-  let kv = cfg.kv_namespaces.find(n => n.binding === 'RT_BLOCKED');
-
-  if (!kv) {
-    kv = { binding: 'RT_BLOCKED', id: '', preview_id: '' };
-    cfg.kv_namespaces.push(kv);
-    console.log('➕  Added RT_BLOCKED KV binding');
-  }
-
-  if (!kv.id) {
-    kv.id = createKV('RT_BLOCKED');
-    console.log(`✔  Created production KV: ${kv.id}`);
-  }
-  if (!kv.preview_id) {
-    kv.preview_id = createKV('RT_BLOCKED', true);
-    console.log(`✔  Created preview KV:    ${kv.preview_id}`);
-  }
-
-  await fs.writeFile(wranglerPath, JSON.stringify(cfg, null, 2));
-  console.log('✔  wrangler.jsonc updated');
-}
-
-/* ---------------------------------------------------------
- * 4 · Generate webhook token & guide
+ * 3 · Generate webhook token & guide
  * -------------------------------------------------------*/
 function generateToken() {
   return crypto.randomBytes(32).toString('hex');
@@ -124,24 +73,23 @@ function printNextSteps(token) {
   console.log(`\nGenerated RT_WEBHOOK_TOKEN:\n\n  ${token}\n`);
   console.log('Next steps:');
   console.log('  1. Store the secret:');
-  console.log('     wrangler secret put RT_WEBHOOK_TOKEN');
-  // console.log('  2. Create KV namespaces if IDs are blank:');
-  // console.log('     wrangler kv:namespace create RT_BLOCKED');
-  // console.log('     wrangler kv:namespace create RT_BLOCKED --preview');
-  console.log('  2. Deploy:');
+  console.log('     echo "' + token + '" | wrangler secret put RT_WEBHOOK_TOKEN');
+  console.log('  2. Create KV namespaces:');
+  console.log('     wrangler kv:namespace create RT_BLOCKED');
+  console.log('     wrangler kv:namespace create RT_BLOCKED --preview');
+  console.log('  3. Add the KV binding to your wrangler config (see README)');
+  console.log('  4. Deploy:');
   console.log('     wrangler pages deploy\n');
 }
 
 /* ---------------------------------------------------------
- * 5 · Run all steps
+ * 4 · Run all steps
  * -------------------------------------------------------*/
 (async () => {
   try {
     await copyFunctions();
-    await patchWrangler();
 
     const token = generateToken();
-
     printNextSteps(token);
   } catch (err) {
     console.error(err);

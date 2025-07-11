@@ -1,6 +1,6 @@
-# Roundtable × Cloudflare Pages — Bot‑Gate Drop‑In (Beta)
+# Roundtable × Cloudflare Pages — Bot‑Gate Drop‑In (Beta)
 
-Adds Roundtable’s auto‑block gate to any existing Cloudflare Pages project. The block‑list lives in Cloudflare KV, so a hot lookup adds only ~1 ms of latency.
+Adds Roundtable's auto‑block gate to any existing Cloudflare Pages project. The block‑list lives in Cloudflare KV, so a hot lookup adds only ~1 ms of latency.
 
 ---
 
@@ -22,13 +22,12 @@ Get `YOUR_SITE_KEY` at <https://accounts.roundtable.ai/account/keys>. The full t
 # Add dev dependency
 npm i -D roundtable-cloudflare-bot-gate
 
-# Scaffold functions and config
+# Scaffold functions and generate token
 npx roundtable-cloudflare-bot-gate init
 ```
-`init` does three things:
+`init` does two things:
 1. Adds `functions/_middleware.js` and `functions/rt-block.js`.
-2. Patches `wrangler.jsonc` (or `.toml`) to insert a `RT_BLOCKED` KV binding with blank `id` / `preview_id`.
-3. Generates a 64‑char `RT_WEBHOOK_TOKEN` and prints it.
+2. Generates a 64‑char `RT_WEBHOOK_TOKEN` and prints it.
 
 ### 3. Store the secret in Cloudflare
 
@@ -38,29 +37,41 @@ echo <RT_WEBHOOK_TOKEN> | wrangler secret put RT_WEBHOOK_TOKEN
 
 Use the token printed by `init`.
 
-### 4. Create the KV namespaces
+### 4. Create KV namespaces & add binding
 
-Run once, copy the IDs Wrangler prints, and paste them into your config:
+Create the namespaces and copy the IDs:
 
 ```bash
-wrangler kv:namespace create RT_BLOCKED            # production ID
-wrangler kv:namespace create RT_BLOCKED --preview  # preview ID for wrangler pages dev
+wrangler kv:namespace create RT_BLOCKED            # copy the production ID
+wrangler kv:namespace create RT_BLOCKED --preview  # copy the preview ID
 ```
-After pasting, your config should look like:
 
+Then add the binding to your Wrangler config:
+
+**For `wrangler.jsonc`:**
 ```jsonc
-"kv_namespaces": [
-  {
-    "binding": "RT_BLOCKED",
-    "id": "abcd1234...",        // prod
-    "preview_id": "wxyz5678..."  // dev/preview
-  }
-]
+{
+  "kv_namespaces": [
+    {
+      "binding": "RT_BLOCKED",
+      "id": "abcd1234...",        // paste production ID here
+      "preview_id": "wxyz5678..."  // paste preview ID here
+    }
+  ]
+}
+```
+
+**For `wrangler.toml`:**
+```toml
+[[kv_namespaces]]
+binding = "RT_BLOCKED"
+id = "abcd1234..."        # paste production ID here
+preview_id = "wxyz5678..."  # paste preview ID here
 ```
 
 ### 5. Email your token + webhook URL (beta step)
 
-Send the token printed in step 2 and your webhook endpoint to <support@roundtable.ai> so we can enable blocking for your site.
+Send the token printed in step 2 and your webhook endpoint to <support@roundtable.ai> so we can enable blocking for your site.
 
 ```
 Endpoint:  https://<your‑domain>/rt-block
