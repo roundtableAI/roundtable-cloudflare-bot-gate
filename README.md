@@ -1,12 +1,12 @@
 # Roundtable × Cloudflare Pages — Bot‑Gate Drop‑In (Beta)
 
-Adds Roundtable's auto‑block gate to any existing Cloudflare Pages project. The block‑list lives in Cloudflare KV, so a hot lookup adds only ~1 ms of latency.
-
-Setup should take 15 minutes max.
+This package adds Roundtable's auto‑block gate to any existing Cloudflare Pages project. The auto-block gate automatically blocks obvious (bad) bots before serving any content, while letting good bots and humans through. As Roundtable updates risk scores, the gate maintains a block list to instantly reject subsequent requests from confirmed bad actors. This block‑list lives in Cloudflare KV so lookups add only ~1 ms of latency, meaning real users never experience any additional friction or delays.
 
 ---
 
 ### 1. Embed the Roundtable tracker
+
+Add the Roundtable tracker to index.html or pages you want to track. Note that you **must** set `data-auto-block="true"` to enable the auto-block gate.
 
 ```html
 <script
