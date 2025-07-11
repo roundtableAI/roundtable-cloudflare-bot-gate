@@ -74,9 +74,11 @@ function stripComments(str) {
 function createKV(name, preview = false) {
   const args = ['kv', 'namespace', 'create', name];
   if (preview) args.push('--preview');
-  args.push('--json');                     // machine-readable
+
   const out = execSync(`npx wrangler ${args.join(' ')}`, { encoding: 'utf8' });
-  return JSON.parse(out).id;               // UUID string
+  const match = out.match(/id:\\s*([\\w-]{32,})/);
+  if (!match) throw new Error('Could not extract KV id from Wrangler output');
+  return match[1];               // UUID string
 }
 
 async function patchWrangler() {
@@ -123,10 +125,10 @@ function printNextSteps(token) {
   console.log('Next steps:');
   console.log('  1. Store the secret:');
   console.log('     wrangler secret put RT_WEBHOOK_TOKEN');
-  console.log('  2. Create KV namespaces if IDs are blank:');
-  console.log('     wrangler kv:namespace create RT_BLOCKED');
-  console.log('     wrangler kv:namespace create RT_BLOCKED --preview');
-  console.log('  3. Deploy:');
+  // console.log('  2. Create KV namespaces if IDs are blank:');
+  // console.log('     wrangler kv:namespace create RT_BLOCKED');
+  // console.log('     wrangler kv:namespace create RT_BLOCKED --preview');
+  console.log('  2. Deploy:');
   console.log('     wrangler pages deploy\n');
 }
 
