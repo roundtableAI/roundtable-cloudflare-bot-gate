@@ -75,8 +75,8 @@ function printNextSteps(token) {
   console.log('  1. Store the secret:');
   console.log('     echo "' + token + '" | wrangler secret put RT_WEBHOOK_TOKEN');
   console.log('  2. Create KV namespaces:');
-  console.log('     wrangler kv:namespace create RT_BLOCKED');
-  console.log('     wrangler kv:namespace create RT_BLOCKED --preview');
+  console.log('     wrangler kv namespace create RT_BLOCKED');
+  console.log('     wrangler kv namespace create RT_BLOCKED --preview');
   console.log('  3. Add the KV binding to your wrangler config (see README)');
   console.log('  4. Deploy:');
   console.log('     wrangler pages deploy\n');

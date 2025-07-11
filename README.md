@@ -2,6 +2,8 @@
 
 Adds Roundtable's auto‑block gate to any existing Cloudflare Pages project. The block‑list lives in Cloudflare KV, so a hot lookup adds only ~1 ms of latency.
 
+Setup should take 15 minutes max.
+
 ---
 
 ### 1. Embed the Roundtable tracker
@@ -39,11 +41,11 @@ Use the token printed by `init`.
 
 ### 4. Create KV namespaces & add binding
 
-Create the namespaces and copy the IDs:
+Create the namespaces and copy the generated IDs:
 
 ```bash
-wrangler kv:namespace create RT_BLOCKED            # copy the production ID
-wrangler kv:namespace create RT_BLOCKED --preview  # copy the preview ID
+wrangler kv namespace create RT_BLOCKED            # copy the production ID
+wrangler kv namespace create RT_BLOCKED --preview  # copy the preview ID
 ```
 
 Then add the binding to your Wrangler config:
