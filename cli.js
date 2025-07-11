@@ -88,10 +88,6 @@ async function patchWrangler() {
     console.log('➕  Added RT_BLOCKED KV binding');
   }
 
-  // Ensure vars section with placeholder token
-  cfg.vars = cfg.vars || {};
-  cfg.vars.RT_WEBHOOK_TOKEN = cfg.vars.RT_WEBHOOK_TOKEN || '';
-
   await fs.writeFile(wranglerPath, JSON.stringify(cfg, null, 2));
   console.log('✔  wrangler.jsonc updated');
 }
@@ -126,9 +122,11 @@ function printNextSteps(token) {
     const token = generateToken();
 
     // Attempt to save secret automatically (will still prompt for confirmation)
-    const wrangler = spawnSync('wrangler', ['secret', 'put', 'RT_WEBHOOK_TOKEN', '--text', token], {
-      stdio: 'inherit'
-    });
+    const wrangler = spawnSync(
+      'wrangler',
+      ['secret', 'put', 'RT_WEBHOOK_TOKEN'],
+      { input: token + '\n', stdio: ['pipe', 'inherit', 'inherit'] }
+    );
     if (wrangler.status !== 0) {
       console.warn('⚠  Could not set secret automatically. Paste it manually.');
     }
